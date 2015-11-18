@@ -1,0 +1,19 @@
+#!/bin/bash
+
+#PBS -l mem=189GB
+#PBS -l walltime=12:00:00
+#PBS -l nodes=1:ppn=1:ivybridge
+#PBS -M jg3862@nyu.edu
+#PBS -m ae
+
+module load jdk/1.7.0_60
+RUNDIR=$SCRATCH/src/run.$PBS_JOBID
+mkdir -p $RUNDIR
+cd $RUNDIR/..
+
+javac -d classes ./nlp/assignments/WordAlignmentTester.java
+java -cp classes -server -Xmx8g nlp.assignments.WordAlignmentTester -path ../data4 -data validate -model baseline -sentences 500000 -iterations 20
+java -cp classes -server -Xmx8g nlp.assignments.WordAlignmentTester -path ../data4 -data validate -model heuristic -sentences 500000 -iterations 20
+java -cp classes -server -Xmx8g nlp.assignments.WordAlignmentTester -path ../data4 -data validate -model dice -sentences 500000 -iterations 20
+java -cp classes -server -Xmx128g nlp.assignments.WordAlignmentTester -path ../data4 -data validate -model ibm1 -sentences 500000 -iterations 20 -null .15 -intersect
+java -cp classes -server -Xmx189g nlp.assignments.WordAlignmentTester -path ../data4 -data validate -model ibm2 -sentences 500000 -iterations 20 -null .15 -alpha 1.4 -initialize -intersect
